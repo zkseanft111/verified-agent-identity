@@ -1,0 +1,35 @@
+name: Verify Human Identity
+on:
+  workflow_dispatch:
+    inputs:
+      agent_name:
+        description: 'livin'
+        required: true
+        default: 'livin'
+      agent_description:
+        description: 'livin'
+        required: true
+        default: 'livin AI Agent'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4 # Update ke v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4 # Update ke v4
+        with:
+          node-version: '20'
+      - name: Step 1 - Install ClawHub skill
+        run: |
+          # Menggunakan YES untuk menjawab konfirmasi secara otomatis jika --force saja tidak cukup
+          yes | npx clawhub@latest install verified-agent-identity --force
+      - name: Install script dependencies
+        run: |
+          cd scripts
+          npm install
+      - name: Step 2 - Create new Ethereum Identity
+        run: node scripts/createNewEthereumIdentity.js
+      - name: Step 3 - Link Human to Agent
+        run: |
+          node scripts/manualLinkHumanToAgent.js --challenge '{"name": "livin", "description": "livin AI Agent"}'
